@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # Copyright (C) 2017 Sur Herrera Paredes
 
+import subprocess
+
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
     with open(outfile,'w') as out_fh:
         writer = csv.writer(out_fh,delimiter = '\t')
