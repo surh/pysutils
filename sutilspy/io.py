@@ -3,6 +3,7 @@
 
 import subprocess
 import csv
+import os
 
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
     with open(outfile,'w') as out_fh:
