@@ -2,6 +2,7 @@
 # Copyright (C) 2017 Sur Herrera Paredes
 
 import subprocess
+import csv
 
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
     with open(outfile,'w') as out_fh:

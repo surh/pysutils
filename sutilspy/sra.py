@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # Copyright (C) 2017 Sur Herrera Paredes
-import csv
 
 def check_set_of_runs(runs, dir):
     print("\t Checking runs..,")
