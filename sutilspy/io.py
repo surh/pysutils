@@ -88,7 +88,7 @@ def write_download(download,outfile):
     
 def write_qsub_submission(fh, commands, dir = os.getcwd(),
                           name = "Job", memory = "1000mb",
-                          logfile = "log", errrorfile = "error",
+                          logfile = "log", errorfile = "error",
                           loptions = [], queue = None, mail = "n",
                           email = None, nodes = "nodes=1:ppn=1"):
     # Writing options
