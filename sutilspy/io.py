@@ -175,13 +175,14 @@ def write_download(download,outfile):
     file.
     
     Args:
-        download: Object with *text* attribute
-        outfile: Name of the file to create and write. It
+        download (str): Object with *text* attribute
+        outfile (str): Name of the file to create and write. It
             will overwrite any existing file with that name
     
     Returns:
         Nothing
     """
+    
     with open(outfile,'w') as out_fh:
         out_fh.write(download.text)
     out_fh.close()
@@ -191,6 +192,34 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
                           logfile = "log", errorfile = "error",
                           loptions = [], queue = None, mail = "n",
                           email = None, nodes = "nodes=1:ppn=1"):
+    """
+    Writes a PBS submission bash file.
+    
+    Takes a filehandle and a list of commands, and writes to it
+    a series of PBS submission instructions, followed by the commands
+    passed. A breif decription of the supportd qsub options is below.
+    See the qsub documentation for more details.
+    
+    Args:
+        fh:
+        commands:
+        dir:
+        name:
+        memory:
+        logfile:
+        errorfile:
+        loptions:
+        queue:
+        mail:
+        email:
+        nodes:
+    
+    Returns:
+        Nothing
+    
+    """
+    
+    
     # Writing options
     fh.write("#!/bin/bash\n")
     fh.write("#PBS -N  " + name + "\n")
@@ -227,9 +256,14 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     fh.write("echo PBS: current home directory is $PBS_O_HOME\n")
     fh.write("echo PBS: PATH = $PBS_O_PATH\n")
     fh.write("echo ------------------------------------------------------\n")
+    fh.write("date\n")
     
     for cmd in commands:
-        fh.write(cmd + "\n")   
+        fh.write(cmd + "\n")
+    
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("date\n")
+       
     
 
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
