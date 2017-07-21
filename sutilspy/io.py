@@ -99,7 +99,7 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     fh.write("#PBS -e " + errorfile + "\n")
     fh.write("#PBS -l mem=" + memory + "\n")
     fh.write("#PBS -m " + mail + "\n")
-    fh.write("#PBS -l mem=" + nodes + "\n")
+    fh.write("#PBS -l " + nodes + "\n")
     
     if queue is not None:
         fh.write("#PBS -q " + queue + "\n")
