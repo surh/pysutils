@@ -4,14 +4,34 @@
 import subprocess
 import csv
 import os
+from subprocess import CalledProcessError
 
 def concatenate_files(infiles, outfile):
+    """Concatenates a list of files.
+    
+    Takes a list of file names and concatenates those
+    files using the UNIX cat utility
+    
+    Args:
+        infiles: List of file names
+        outfile: File name to store the concatenated result.
+            It will overwrite any existing file with that
+            name.
+    
+    Returns:
+        Returns the result of calling `:py:func:~subprocess.run`
+        
+    Raises:
+        CalledProcessError: If the cat command returns a non-zero
+            status.
+    """
+    
     command = " ".join(infiles) 
     command = "cat " + command + " > " + outfile
-    check = download_runs.run_command(command)
+    check = run_command(command)
     
     if check.returncode != 0:
-        raise ProcessError("Could not concatenate files")
+        raise CalledProcessError("Could not concatenate files")
     
     return(check)
 
