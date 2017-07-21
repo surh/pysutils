@@ -54,6 +54,25 @@ def qsub_submissions(submissions,logdir):
         
     print("==========SUBMISSIONS DONE==========\n\n")
     
+def return_column(infile,col = 1, separator = '\t', header = True):
+    print("\n=============================================")
+    col -= 1
+    with open(infile,'r') as fh:
+        print("\tReading table file {}".format(infile))
+        reader = csv.reader(fh,delimiter = separator)
+        if header:
+            header = next(reader)
+        
+        res = []
+        i = 0
+        for row in reader:
+            res.append(row[col])
+            i += 1
+    fh.close()
+    print("\tProcessed {} lines".format(str(i)))
+    print("=============================================")
+    return(res)
+    
 def run_command(command):
     status = 0;
     print("Executing:\n>{}".format(command))
