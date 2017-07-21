@@ -1,4 +1,7 @@
-"""General utilities package"""
+"""General utilities package
+
+Mostly for bioinfomatics
+"""
 
 # Sepup file based on sample project
 # Always prefer setuptools over distutils
