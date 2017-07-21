@@ -19,7 +19,7 @@ def concatenate_files(infiles, outfile):
             name.
     
     Returns:
-        Returns the result of calling `:py:func:~subprocess.run`
+        Returns the result of calling :py:func:`subprocess.run`
         
     Raises:
         CalledProcessError: If the cat command returns a non-zero
