@@ -1,4 +1,4 @@
-[(https://readthedocs.org/projects/sutilspy/badge/)](sutilspy.rtfd.io)
+![(https://readthedocs.org/projects/sutilspy/badge/)](sutilspy.rtfd.io)
 
 # General utilites
 
