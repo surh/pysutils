@@ -1,3 +1,5 @@
+[(https://readthedocs.org/projects/sutilspy/badge/)](sutilspy.rtfd.io)
+
 # General utilites
 
 The purpose of this packages it to consolidate functions and classes that
