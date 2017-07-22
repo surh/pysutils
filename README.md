@@ -1,4 +1,4 @@
-![(https://readthedocs.org/projects/sutilspy/badge/)](sutilspy.rtfd.io)
+[![Documentation Status](https://readthedocs.org/projects/sutilspy/badge/?version=latest)](http://sutilspy.readthedocs.io/en/latest/?badge=latest)
 
 # General utilites
 
