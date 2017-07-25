@@ -201,18 +201,23 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     See the qsub documentation for more details.
     
     Args:
-        fh:
-        commands:
-        dir:
-        name:
-        memory:
-        logfile:
-        errorfile:
-        loptions:
-        queue:
-        mail:
-        email:
-        nodes:
+        fh: A writable file handle from the stardad io library, i.e. the result
+            of a call to :py:func:`open`.
+        commands (list): A list of strings where each string is a command to be executed by
+            the cluster. Commands will be executed in the order defined by this list.
+        dir (str): The working directory to use for the jobs. Defaults to the current working
+            directory.
+        name (str): The name to give the job.
+        memory (str): The memory requested for the job
+        logfile (str): The file name to use for the STDOUT of the submission script
+        errorfile (str): The file name to use for the STDERR of the submission script
+        loptions (list): A list of strings where each one is a long option (-l) as defined
+            by PBS.
+        queue (str): The name of the queue to use
+        mail (str): Whether to send an email or not. 
+        email (str): Email address to receive job information
+        nodes (str): A string of the form 'nodes=XX:ppn=YY', where XX is the number of nodes
+            to reserve, and YY the number of cpus per node.
     
     Returns:
         Nothing
@@ -267,6 +272,27 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     
 
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
+    """Writes a table
+    
+    Takes a file name and a list of rows, and writes a file in table format.
+    It will overwrite any existing file with that  name.
+    
+    Args:
+        outfile (str): Name of file to be created, and overwritten if necessary,
+            where the table will be printed
+        rows (list): List where each element is a list corresponding to the fields
+            on each row
+        header (list): A list with header names. If it is not None it will be printed
+            before *row*.
+        delimiter (str): A string indicating the delimiter to use to separate fields
+            in the table.
+        verbose (bool): Boolean indicating whether to print informational messages
+            to STDOUT.
+    
+    Returns:
+        The number of lines printed
+    """
+    
     with open(outfile,'w') as out_fh:
         writer = csv.writer(out_fh,delimiter = '\t')
         if verbose:
