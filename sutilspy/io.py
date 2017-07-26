@@ -268,7 +268,96 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     
     fh.write("echo ------------------------------------------------------\n")
     fh.write("date\n")
-       
+    
+def write_slurm_submission(fh, commands, dir = os.getcwd(),
+                           name = "Job", memory = "10G",
+                           logfile = "%j.log", errorfile = "%j.err",
+                           queue = None, mail = "NONE",
+                           email = None, nodes = "1", cpus = "1",
+                           time = '2:00:00'):
+    """
+    Writes a SLURM submission bash file.
+    
+    Takes a filehandle and a list of commands, and writes a file that
+    can be subitted to SLURM via the sbatch command. A brief description
+    of the supportted SLURMoptions is below.
+    See the sbatch documentation for more details.
+    
+    Args:
+        fh: A writable file handle from the stardad io library, i.e. the result
+            of a call to :py:func:`open`.
+        commands (list): A list of strings where each string is a command to be executed by
+            the cluster. Commands will be executed in the order defined by this list.
+        dir (str): The working directory to use for the jobs. Defaults to the current working
+            directory.
+        name (str): The name to give the job.
+        memory (str): The memory requested for the job. Default="10G"
+        logfile (str): The file name to use for the STDOUT of the submission script
+        errorfile (str): The file name to use for the STDERR of the submission script
+        loptions (list): A list of strings where each one is a long option (-l) as defined
+            by PBS.
+        queue (str): The name of the SLURM partition to use
+        mail (str): Whether to send an email or not. se SLURM documentation for details.
+            Default="NONE"
+        email (str): Email address to receive job information
+        nodes (str): Number of nodes to request.
+        cpus (str): Number of cpus/threads to reserve per node. See -c option
+            in sbatch
+        time (str): A string of the form 'HH:MM:SS' indicating the maximum duration of the
+            job
+    
+    Returns:
+        Nothing
+    
+    """
+    
+    ## SLURM
+    # Writing options
+    fh.write("#!/bin/bash\n")
+    fh.write("#SBATCH --job-name=" + name + "\n")
+    fh.write("#SBATCH --workdir=" + dir + "\n")
+    fh.write("#SBATCH --output=" + logfile + "\n")
+    #fh.write("#SBATCH --output=%j.log\n")
+    fh.write("#SBATCH --error=" + errorfile + "\n")
+    fh.write("#SBATCH --time=" + time + "\n")
+    fh.write("#SBATCH --nodes=" + nodes + "\n")
+    fh.write("#SBATCH -c " + cpus + "\n")
+    fh.write("#SBATCH --mem=" + memory + "\n")    
+    fh.write("#SBATCH --mail-type=" + mail + "\n")
+
+    if queue is not None:
+        fh.write("#SBATCH -p " + queue + "\n")
+    if email is not None:
+        fh.write("#SBATCH ---mail-user=" + email + "\n")
+    
+    # Adding l options like cput, walltime,
+    #for opt in loptions:
+    #    fh.write("#PBS -l " + opt + "\n")
+        
+    # Writing some useful information. Based
+    # on suggestions at
+    # http://qcd.phys.cmu.edu/QCDcluster/pbs/run_serial.html
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("echo -n 'Job is running on node '; cat $SLURM_JOB_NODELIST\n")
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("echo SLURM: sbatch is running on $SLURM_SUBMIT_HOST\n")
+    #fh.write("echo SLURM: originating queue is $PBS_O_QUEUE\n")
+    fh.write("echo SLURM: executing queue is $SLURM_JOB_PARTITION\n")
+    #fh.write("echo SLURM: working directory is $PBS_O_WORKDIR\n")
+    #fh.write("echo SLURM: execution mode is $PBS_ENVIRONMENT\n")
+    fh.write("echo SLURM: job identifier is $SLURM_JOBID\n")
+    fh.write("echo SLURM: job name is $SLURM_JOB_NAME\n")
+    fh.write("echo SLURM: node file is $PBS_NODEFILE\n")
+    #fh.write("echo SLURM: current home directory is $PBS_O_HOME\n")
+    #fh.write("echo SLURM: PATH = $PBS_O_PATH\n")
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("date\n")
+    
+    for cmd in commands:
+        fh.write(cmd + "\n")
+    
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("date\n")
     
 
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
