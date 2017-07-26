@@ -317,7 +317,6 @@ def write_slurm_submission(fh, commands, dir = os.getcwd(),
     fh.write("#SBATCH --job-name=" + name + "\n")
     fh.write("#SBATCH --workdir=" + dir + "\n")
     fh.write("#SBATCH --output=" + logfile + "\n")
-    #fh.write("#SBATCH --output=%j.log\n")
     fh.write("#SBATCH --error=" + errorfile + "\n")
     fh.write("#SBATCH --time=" + time + "\n")
     fh.write("#SBATCH --nodes=" + nodes + "\n")
@@ -329,25 +328,21 @@ def write_slurm_submission(fh, commands, dir = os.getcwd(),
         fh.write("#SBATCH -p " + queue + "\n")
     if email is not None:
         fh.write("#SBATCH ---mail-user=" + email + "\n")
-    
-    # Adding l options like cput, walltime,
-    #for opt in loptions:
-    #    fh.write("#PBS -l " + opt + "\n")
         
     # Writing some useful information. Based
     # on suggestions at
     # http://qcd.phys.cmu.edu/QCDcluster/pbs/run_serial.html
     fh.write("echo ------------------------------------------------------\n")
-    fh.write("echo -n 'Job is running on node '; cat $SLURM_JOB_NODELIST\n")
+    fh.write("echo SLURM: Job name is {}".format(name))
+    #fh.write("echo -n 'Job is running on node '; cat $SLURM_JOB_NODELIST\n")
     fh.write("echo ------------------------------------------------------\n")
     fh.write("echo SLURM: sbatch is running on $SLURM_SUBMIT_HOST\n")
-    #fh.write("echo SLURM: originating queue is $PBS_O_QUEUE\n")
     fh.write("echo SLURM: executing queue is $SLURM_JOB_PARTITION\n")
     #fh.write("echo SLURM: working directory is $PBS_O_WORKDIR\n")
     #fh.write("echo SLURM: execution mode is $PBS_ENVIRONMENT\n")
-    fh.write("echo SLURM: job identifier is $SLURM_JOBID\n")
+    fh.write("echo SLURM: job identifier is $SLURM_JOB_ID\n")
     fh.write("echo SLURM: job name is $SLURM_JOB_NAME\n")
-    fh.write("echo SLURM: node file is $PBS_NODEFILE\n")
+    #fh.write("echo SLURM: node file is $PBS_NODEFILE\n")
     #fh.write("echo SLURM: current home directory is $PBS_O_HOME\n")
     #fh.write("echo SLURM: PATH = $PBS_O_PATH\n")
     fh.write("echo ------------------------------------------------------\n")
@@ -358,6 +353,9 @@ def write_slurm_submission(fh, commands, dir = os.getcwd(),
     
     fh.write("echo ------------------------------------------------------\n")
     fh.write("date\n")
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("sstat --format JobID,NTasks,MaxRSS,MaxVMsize,AveRSS,AveVMSize -J $SLURM_JOB_ID")
+    
     
 
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
