@@ -167,6 +167,32 @@ def run_command(command):
 
     return(status)
 
+
+def sbatch_submissions(submissions,logdir):
+    """Submits to SLURM via sbatch
+    
+    Takes a list of file names of SLURM submission files, and sends
+    them to sbatch.
+    
+    Args:
+        submissions: List of file paths to submit to sbatch.
+        logdir: A directory path that is checked for existence before
+            submitting the jobs. If it does not exists it is created.
+            
+    Returns:
+        Nothing
+    """
+    
+    if os.path.exists(logdir):
+        print("Logdir exists")
+    else:
+        os.mkdir(logdir)
+    
+    for file in submissions:
+        run_command("sbatch " + file)
+        
+    print("==========SUBMISSIONS DONE==========\n\n")
+
 def write_download(download,outfile):
     """Writes the result of :py:func:`requests.get` to a file
     
