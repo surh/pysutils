@@ -30,7 +30,7 @@ def clean_dirs(dirs, location = None):
             
             if os.path.isdir(dir):
                 print("\tRemoving {}".format(dir))
-                #shutil.rmtree(dir)
+                shutil.rmtree(dir)
                 removed.append(dir)
             else:
                 print("\tDirectory {} not found. SKIPPING".format(dir))
