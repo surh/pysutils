@@ -63,7 +63,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude = ['docs']),
+    packages=find_packages(exclude = ['docs', 'tests']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -80,6 +80,8 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={},
+    
+    tests_require=['unittest','pytest'],
     
     # Python version
     python_requires='>=3',
