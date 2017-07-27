@@ -5,6 +5,48 @@ import subprocess
 import csv
 import os
 from subprocess import CalledProcessError
+import shutil
+
+def clean_dirs(dirs, location = None):
+    """Takes a set of directories and  removes them
+    
+    Removes a list of directories
+    
+    Args:
+        dirs: Either a single directory name, a file that has a
+            list of directories (one per line) to be removed, or a
+            list of directories
+        location: Base path for the directories to be removed
+    
+    Returns: List of removed directory
+    """
+    
+    if isinstance(dirs, list):
+        print("== Removing directories")
+        removed = []
+        for dir in dirs:
+            if location is not None:
+                dir = location + "/" + dir
+            
+            if os.path.isdir(dir):
+                print("\tRemoving {}".format(dir))
+                #shutil.rmtree(dir)
+                removed.append(dir)
+            else:
+                print("\tDirectory {} not found. SKIPPING".format(dir))
+    elif os.path.isfile(dirs):
+        # Read file
+        with open(dirs,'r') as fh:
+            dirlist = [line.rstrip() for line in fh]
+        fh.close()
+        removed = clean_dirs(dirlist,location)
+    else:
+        # Assume it is a single directory
+        removed = clean_dirs([dirs],location)
+    
+    return(removed)       
+                
+    
 
 def concatenate_files(infiles, outfile):
     """Concatenates a list of files.
