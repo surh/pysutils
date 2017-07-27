@@ -5,6 +5,48 @@ import subprocess
 import csv
 import os
 from subprocess import CalledProcessError
+import shutil
+
+def clean_dirs(dirs, location = None):
+    """Takes a set of directories and  removes them
+    
+    Removes a list of directories
+    
+    Args:
+        dirs: Either a single directory name, a file that has a
+            list of directories (one per line) to be removed, or a
+            list of directories
+        location: Base path for the directories to be removed
+    
+    Returns: List of removed directory
+    """
+    
+    if isinstance(dirs, list):
+        print("== Removing directories")
+        removed = []
+        for dir in dirs:
+            if location is not None:
+                dir = location + "/" + dir
+            
+            if os.path.isdir(dir):
+                print("\tRemoving {}".format(dir))
+                shutil.rmtree(dir)
+                removed.append(dir)
+            else:
+                print("\tDirectory {} not found. SKIPPING".format(dir))
+    elif os.path.isfile(dirs):
+        # Read file
+        with open(dirs,'r') as fh:
+            dirlist = [line.rstrip() for line in fh]
+        fh.close()
+        removed = clean_dirs(dirlist,location)
+    else:
+        # Assume it is a single directory
+        removed = clean_dirs([dirs],location)
+    
+    return(removed)       
+                
+    
 
 def concatenate_files(infiles, outfile):
     """Concatenates a list of files.
@@ -167,6 +209,32 @@ def run_command(command):
 
     return(status)
 
+
+def sbatch_submissions(submissions,logdir):
+    """Submits to SLURM via sbatch
+    
+    Takes a list of file names of SLURM submission files, and sends
+    them to sbatch.
+    
+    Args:
+        submissions: List of file paths to submit to sbatch.
+        logdir: A directory path that is checked for existence before
+            submitting the jobs. If it does not exists it is created.
+            
+    Returns:
+        Nothing
+    """
+    
+    if os.path.exists(logdir):
+        print("Logdir exists")
+    else:
+        os.mkdir(logdir)
+    
+    for file in submissions:
+        run_command("sbatch " + file)
+        
+    print("==========SUBMISSIONS DONE==========\n\n")
+
 def write_download(download,outfile):
     """Writes the result of :py:func:`requests.get` to a file
     
@@ -201,18 +269,23 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     See the qsub documentation for more details.
     
     Args:
-        fh:
-        commands:
-        dir:
-        name:
-        memory:
-        logfile:
-        errorfile:
-        loptions:
-        queue:
-        mail:
-        email:
-        nodes:
+        fh: A writable file handle from the stardad io library, i.e. the result
+            of a call to :py:func:`open`.
+        commands (list): A list of strings where each string is a command to be executed by
+            the cluster. Commands will be executed in the order defined by this list.
+        dir (str): The working directory to use for the jobs. Defaults to the current working
+            directory.
+        name (str): The name to give the job.
+        memory (str): The memory requested for the job
+        logfile (str): The file name to use for the STDOUT of the submission script
+        errorfile (str): The file name to use for the STDERR of the submission script
+        loptions (list): A list of strings where each one is a long option (-l) as defined
+            by PBS.
+        queue (str): The name of the queue to use
+        mail (str): Whether to send an email or not. 
+        email (str): Email address to receive job information
+        nodes (str): A string of the form 'nodes=XX:ppn=YY', where XX is the number of nodes
+            to reserve, and YY the number of cpus per node.
     
     Returns:
         Nothing
@@ -263,10 +336,118 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     
     fh.write("echo ------------------------------------------------------\n")
     fh.write("date\n")
-       
+    
+def write_slurm_submission(fh, commands, dir = os.getcwd(),
+                           name = "Job", memory = "10G",
+                           logfile = "%j.log", errorfile = "%j.err",
+                           queue = None, mail = "NONE",
+                           email = None, nodes = "1", cpus = "1",
+                           time = '2:00:00'):
+    """
+    Writes a SLURM submission bash file.
+    
+    Takes a filehandle and a list of commands, and writes a file that
+    can be subitted to SLURM via the sbatch command. A brief description
+    of the supportted SLURMoptions is below.
+    See the sbatch documentation for more details.
+    
+    Args:
+        fh: A writable file handle from the stardad io library, i.e. the result
+            of a call to :py:func:`open`.
+        commands (list): A list of strings where each string is a command to be executed by
+            the cluster. Commands will be executed in the order defined by this list.
+        dir (str): The working directory to use for the jobs. Defaults to the current working
+            directory.
+        name (str): The name to give the job.
+        memory (str): The memory requested for the job. Default="10G"
+        logfile (str): The file name to use for the STDOUT of the submission script
+        errorfile (str): The file name to use for the STDERR of the submission script
+        loptions (list): A list of strings where each one is a long option (-l) as defined
+            by PBS.
+        queue (str): The name of the SLURM partition to use
+        mail (str): Whether to send an email or not. se SLURM documentation for details.
+            Default="NONE"
+        email (str): Email address to receive job information
+        nodes (str): Number of nodes to request.
+        cpus (str): Number of cpus/threads to reserve per node. See -c option
+            in sbatch
+        time (str): A string of the form 'HH:MM:SS' indicating the maximum duration of the
+            job
+    
+    Returns:
+        Nothing
+    
+    """
+    
+    ## SLURM
+    # Writing options
+    fh.write("#!/bin/bash\n")
+    fh.write("#SBATCH --job-name=" + name + "\n")
+    fh.write("#SBATCH --workdir=" + dir + "\n")
+    fh.write("#SBATCH --output=" + logfile + "\n")
+    fh.write("#SBATCH --error=" + errorfile + "\n")
+    fh.write("#SBATCH --time=" + time + "\n")
+    fh.write("#SBATCH --nodes=" + nodes + "\n")
+    fh.write("#SBATCH -c " + cpus + "\n")
+    fh.write("#SBATCH --mem=" + memory + "\n")    
+    fh.write("#SBATCH --mail-type=" + mail + "\n")
+
+    if queue is not None:
+        fh.write("#SBATCH -p " + queue + "\n")
+    if email is not None:
+        fh.write("#SBATCH ---mail-user=" + email + "\n")
+        
+    # Writing some useful information. Based
+    # on suggestions at
+    # http://qcd.phys.cmu.edu/QCDcluster/pbs/run_serial.html
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("echo SLURM: Job name is {}".format(name))
+    #fh.write("echo -n 'Job is running on node '; cat $SLURM_JOB_NODELIST\n")
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("echo SLURM: sbatch is running on $SLURM_SUBMIT_HOST\n")
+    fh.write("echo SLURM: executing queue is $SLURM_JOB_PARTITION\n")
+    #fh.write("echo SLURM: working directory is $PBS_O_WORKDIR\n")
+    #fh.write("echo SLURM: execution mode is $PBS_ENVIRONMENT\n")
+    fh.write("echo SLURM: job identifier is $SLURM_JOB_ID\n")
+    fh.write("echo SLURM: job name is $SLURM_JOB_NAME\n")
+    #fh.write("echo SLURM: node file is $PBS_NODEFILE\n")
+    #fh.write("echo SLURM: current home directory is $PBS_O_HOME\n")
+    #fh.write("echo SLURM: PATH = $PBS_O_PATH\n")
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("date\n")
+    
+    for cmd in commands:
+        fh.write(cmd + "\n")
+    
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("date\n")
+    fh.write("echo ------------------------------------------------------\n")
+    fh.write("sstat --format JobID,NTasks,MaxRSS,MaxVMsize,AveRSS,AveVMSize -J $SLURM_JOB_ID")
+    
     
 
 def write_table(outfile,rows, header = None, delimiter = "\t", verbose = False):
+    """Writes a table
+    
+    Takes a file name and a list of rows, and writes a file in table format.
+    It will overwrite any existing file with that  name.
+    
+    Args:
+        outfile (str): Name of file to be created, and overwritten if necessary,
+            where the table will be printed
+        rows (list): List where each element is a list corresponding to the fields
+            on each row
+        header (list): A list with header names. If it is not None it will be printed
+            before *row*.
+        delimiter (str): A string indicating the delimiter to use to separate fields
+            in the table.
+        verbose (bool): Boolean indicating whether to print informational messages
+            to STDOUT.
+    
+    Returns:
+        The number of lines printed
+    """
+    
     with open(outfile,'w') as out_fh:
         writer = csv.writer(out_fh,delimiter = '\t')
         if verbose:
