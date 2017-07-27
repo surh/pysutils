@@ -316,7 +316,7 @@ def write_qsub_submission(fh, commands, dir = os.getcwd(),
     # on suggestions at
     # http://qcd.phys.cmu.edu/QCDcluster/pbs/run_serial.html
     fh.write("echo ------------------------------------------------------\n")
-    fh.write("echo -n 'Job is running on node '; cat $PBS_NODEFILE\n")
+    #fh.write("echo -n 'Job is running on node '; cat $PBS_NODEFILE\n")
     fh.write("echo ------------------------------------------------------\n")
     fh.write("echo PBS: qsub is running on $PBS_O_HOST\n")
     fh.write("echo PBS: originating queue is $PBS_O_QUEUE\n")
@@ -422,7 +422,7 @@ def write_slurm_submission(fh, commands, dir = os.getcwd(),
     fh.write("echo ------------------------------------------------------\n")
     fh.write("date\n")
     fh.write("echo ------------------------------------------------------\n")
-    fh.write("sstat --format JobID,NTasks,MaxRSS,MaxVMsize,AveRSS,AveVMSize -J $SLURM_JOB_ID")
+    fh.write("sstat --format JobID,NTasks,MaxRSS,MaxVMsize,AveRSS,AveVMSize -j $SLURM_JOB_ID")
     
     
 
