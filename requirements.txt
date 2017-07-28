@@ -1,4 +1,3 @@
 # Requirements
 setuptools
-sutilspy
 #setup
