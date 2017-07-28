@@ -81,7 +81,8 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={},
     
-    tests_require=['unittest','pytest'],
+    tests_require=['pytest'],
+    setup_requires=['pytest-runner'],
     
     # Python version
     python_requires='>=3',
