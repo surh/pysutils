@@ -55,7 +55,7 @@ if __name__ == "__main__":
     print("Creating links")
     for f in paths:
         abspath = os.path.abspath(f)
-        if not os.path.isfile(abspath):
+        if not os.path.exists(abspath):
             raise FileNotFoundError("File {} not found".format(abspath))
 
         dst = '/'.join([args.outdir, os.path.basename(f)])
