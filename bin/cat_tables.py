@@ -33,7 +33,7 @@ def process_arguments():
     required.add_argument("FILES", help=("Files to concatenate. Each file "
                                          "must be tab-delimited, and the "
                                          "first row must contain the headers"),
-                          required=True, type=str, nargs='+')
+                          type=str, nargs='+')
     required.add_argument("--outfile", help=("Filename to write the "
                                              "concatenated results"),
                           required=True, type=str)
