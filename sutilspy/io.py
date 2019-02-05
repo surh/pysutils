@@ -401,7 +401,7 @@ def write_slurm_submission(fh, commands, dir = os.getcwd(),
     # on suggestions at
     # http://qcd.phys.cmu.edu/QCDcluster/pbs/run_serial.html
     fh.write("echo ------------------------------------------------------\n")
-    fh.write("echo SLURM: Job name is {}".format(name))
+    fh.write("echo SLURM: Job name is {}\n".format(name))
     #fh.write("echo -n 'Job is running on node '; cat $SLURM_JOB_NODELIST\n")
     fh.write("echo ------------------------------------------------------\n")
     fh.write("echo SLURM: sbatch is running on $SLURM_SUBMIT_HOST\n")
