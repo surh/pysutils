@@ -59,6 +59,6 @@ if __name__ == "__main__":
         res = res.append(tab)
         i = i + 1
     print("Processed {} files".format(str(i)))
-    print("Writting {}".format(args.output))
+    print("Writting {}".format(args.outfile))
     res.to_csv(args.outfile, sep="\t", na_rep="NA",
                header=True, index=False)
