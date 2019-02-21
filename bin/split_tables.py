@@ -80,9 +80,12 @@ def split_table(Tab, step_size, outdir, prefix):
 if __name__ == "__main__":
     args = process_arguments()
 
+    print(args.FILE)
     Tab = pd.read_csv(args.FILE, sep="\t")
     nrows = Tab.shape[0]
+    print("read")
     if args.nchunks > 0:
+        print("chunks")
         if args.nchunks > nrows:
             args.nchunks = nrows
         step_size = nrows / args.nchunks
@@ -91,4 +94,5 @@ if __name__ == "__main__":
         split_table(Tab, step_site, args.outdir, args.prefix)
 
     elif args.nlines > 0:
+        print("lines")
         split_table(Tab, args.nlines, args.outdir, args.prefix)
