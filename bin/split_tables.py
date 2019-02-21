@@ -32,7 +32,7 @@ def process_arguments():
     # Define required arguments
     required.add_argument("FILE", help=("Tab-delimited file, and the first "
                                         "row must contain the headers"),
-                          type=str, nargs=1)
+                          type=str)
 
     # Optional arguments
     parser.add_argument("--nchunks", help=("Number of new files to create"),
