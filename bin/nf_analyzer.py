@@ -17,7 +17,8 @@
 
 import argparse
 import os
-import numpy as np
+# import numpy as np
+# import pandas
 
 
 def process_arguments():
@@ -35,9 +36,17 @@ def process_arguments():
 
     # Define other arguments
     parser.add_argument("--use-trace", help=("Look for a trace.txt file"),
-                        type=str,
                         default=False,
                         action="store_true")
+    parser.add_argument("--list-files", help=("Nextflow proces file to list"),
+                        type=str,
+                        default='',
+                        choices=['', 'exitcode', 'log', 'out', 'err'])
+    parser.add_argument("--exitcode", help=("Select only processes with "
+                                            "this exitcode. If -1, keep "
+                                            "all processes."),
+                        default=-1,
+                        type=int)
 
     # Read arguments
     print("Reading arguments")
@@ -68,8 +77,29 @@ def list_work_dirs(workdir, trace=None):
     return workdirs
 
 
+def get_process_exitcodes(workdirs):
+    """For a list of directories, get the value of the .get_process_exitcode
+    file."""
+
+    Exitcodes = dict()
+    for wd in workdirs:
+        exitcode_file = os.path.join(wd, ".exitcode")
+        if not os.path.isfile(exitcode_file):
+            raise FileNotFoundError(".exitcode file missing at {}".format(wd))
+
+        with open(exitcode_file, 'r') as eh:
+            exitcode = int(eh.readline())
+            Exitcodes[wd] = exitcode
+        eh.close()
+
+    return Exitcodes
+
+
 if __name__ == "__main__":
     args = process_arguments()
 
     workdirs = list_work_dirs(args.workdir)
     print(workdirs)
+    Exitcodes = get_process_exitcodes(workdirs)
+    print("==Exitcodes")
+    print(Exitcodes)
