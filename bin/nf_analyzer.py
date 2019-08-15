@@ -35,10 +35,13 @@ def process_arguments():
                           required=True, type=str)
 
     # Define other arguments
-    parser.add_argument("--use-trace", help=("Look for a trace.txt file"),
+    parser.add_argument("--use_trace", help=("Look for a trace.txt file"),
                         default=False,
                         action="store_true")
-    parser.add_argument("--list-files", help=("Nextflow proces file to list"),
+    parser.add_argument("--trace_file", help=("Nextflow trace file."),
+                        type=str,
+                        default='trace.txt')
+    parser.add_argument("--list_files", help=("Nextflow proces file to list"),
                         type=str,
                         default='',
                         choices=['', 'exitcode', 'log', 'out', 'err'])
@@ -95,11 +98,35 @@ def get_process_exitcodes(workdirs):
     return Exitcodes
 
 
+def read_nf_trace(trace_file):
+    """Read trace file from nextflow --with-trace option"""
+
+    if not os.path.isfile(trace_file):
+        raise FileNotFoundError("{} file not found".format(trace_file))
+
+    with open(trace_file, 'r') as ih:
+        header = ih.readline().splut("\t")
+        # Create dictionary
+        Trace = dict()
+        for h in header:
+            Trace[h] = []
+
+        # Readlines
+        for line in ih:
+            fields = line.split("\t")
+            [Trace[header[i]].append(fields[i]) for i in range(len(fields))]
+    ih.close()
+
+    return Trace
+
+
 if __name__ == "__main__":
     args = process_arguments()
 
     workdirs = list_work_dirs(args.workdir)
+    print("==Workdirs")
     print(workdirs)
     Exitcodes = get_process_exitcodes(workdirs)
     print("==Exitcodes")
     print(Exitcodes)
+    if args.use_trace:
