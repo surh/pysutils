@@ -53,8 +53,7 @@ def process_arguments():
                         type=int)
     parser.add_argument("--status", help=("Select only processes with "
                                           "this status from the trace file. "
-                                          "If 'any', keep "
-                                          "all processes."),
+                                          "If 'any', ignore this value"),
                         default='any',
                         type=str)
     parser.add_argument("--invert", help=("Select processes that don't "
@@ -132,12 +131,13 @@ def read_nf_trace(trace_file):
     return Trace
 
 
-def get_trace_workdirs(Trace):
+def get_trace_workdirs(Trace, status='any', invert=False):
     """Read workdirs listed in nextflow trace"""
 
     workdirs = []
-    for hash in Trace['hash']:
-        pattern = 'work/' + hash + '*'
+    # for hash in Trace['hash']:
+    for i in range(len(Trace['hash'])):
+        pattern = 'work/' + Trace['hash'][i] + '*'
         new_dir = glob.glob(pattern)
         if len(new_dir) > 1:
             raise ValueError("More than one file "
@@ -147,7 +147,13 @@ def get_trace_workdirs(Trace):
         else:
             raise ValueError("Mising directory from hasg {}".format(hash))
 
-        workdirs.append(new_dir)
+        if status != 'any':
+            curr_status = Trace['status'][i]
+            # Use xor to determine match and invert
+            if (curr_status == status) ^ invert:
+                workdirs.append(new_dir)
+        else:
+            workdirs.append(new_dir)
 
     return workdirs
 
@@ -160,7 +166,9 @@ if __name__ == "__main__":
         Trace = read_nf_trace(args.trace_file)
         print("==Trace")
         print(Trace)
-        workdirs = get_trace_workdirs(Trace)
+        workdirs = get_trace_workdirs(Trace=Trace,
+                                      status=args.status,
+                                      invert=args.invert)
     else:
         workdirs = list_work_dirs(args.workdir)
     print("==Workdirs")
