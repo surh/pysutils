@@ -106,7 +106,7 @@ def read_nf_trace(trace_file):
         raise FileNotFoundError("{} file not found".format(trace_file))
 
     with open(trace_file, 'r') as ih:
-        header = ih.readline().splut("\t")
+        header = ih.readline().split("\t")
         # Create dictionary
         Trace = dict()
         for h in header:
