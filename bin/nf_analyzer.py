@@ -51,6 +51,17 @@ def process_arguments():
                                             "all processes."),
                         default=-1,
                         type=int)
+    parser.add_argument("--status", help=("Select only processes with "
+                                          "this status from the trace file. "
+                                          "If 'any', keep "
+                                          "all processes."),
+                        default='any',
+                        type=str)
+    parser.add_argument("--invert", help=("Select processes that don't "
+                                          "match the selected exitcode "
+                                          "or status."),
+                        default=False,
+                        action="store_true")
 
     # Read arguments
     print("Reading arguments")
