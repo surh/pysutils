@@ -17,6 +17,7 @@
 
 import argparse
 import os
+import glob
 # import numpy as np
 # import pandas
 
@@ -60,7 +61,7 @@ def process_arguments():
     return args
 
 
-def list_work_dirs(workdir, trace=None):
+def list_work_dirs(workdir):
     """Find the path of all work directories"""
 
     work_level1 = os.listdir(workdir)
@@ -120,13 +121,41 @@ def read_nf_trace(trace_file):
     return Trace
 
 
+def get_trace_workdirs(Trace):
+    """Read workdirs listed in nextflow trace"""
+
+    workdirs = []
+    for hash in Trace['hash']:
+        pattern = 'work/' + hash + '*'
+        new_dir = glob.glob(pattern)
+        if len(new_dir) > 1:
+            raise ValueError("More than one file "
+                             "returned from hash {}".format(hash))
+        elif len(new_dir) == 1:
+            new_dir = new_dir[0]
+        else:
+            raise ValueError("Mising directory from hasg {}".format(hash))
+
+        workdirs.append(new_dir)
+
+    return workdirs
+
+
 if __name__ == "__main__":
     args = process_arguments()
 
-    workdirs = list_work_dirs(args.workdir)
+    # Get list of work directories
+    if args.use_trace:
+        Trace = read_nf_trace(args.trace_file)
+        print("==Trace")
+        print(Trace)
+        workdirs = get_trace_workdirs(Trace)
+    else:
+        workdirs = list_work_dirs(args.workdir)
     print("==Workdirs")
     print(workdirs)
+
+    # Get exitcodes
     Exitcodes = get_process_exitcodes(workdirs)
     print("==Exitcodes")
     print(Exitcodes)
-    if args.use_trace:
