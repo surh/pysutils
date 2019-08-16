@@ -172,6 +172,22 @@ def get_trace_workdirs(Trace, status='any', invert=False):
     return workdirs
 
 
+def list_nf_files(workdirs, file):
+    """For a list of workdirs, check the existance and list
+    one type of nextflow files"""
+
+    file_list = []
+    for wd in workdirs:
+        file_path = '.command.' + file
+        file_path = os.path.join(wd, file_path)
+        if not os.path.isdir(file_path):
+            raise FileNotFoundError("File {} not found.".format(file_path))
+        else:
+            file_list.append(file_path)
+
+    return file_list
+
+
 if __name__ == "__main__":
     args = process_arguments()
 
@@ -199,3 +215,11 @@ if __name__ == "__main__":
                                          exitcode=args.exitcode,
                                          invert=args.invert)
     print("===Workdirs")
+    print(workdirs)
+
+    # Get file list
+    file_list = list_nf_files(workdirs=workdirs, file=args.file_list)
+
+    # Print
+    for f in file_list:
+        print(f)
