@@ -42,13 +42,17 @@ def process_arguments():
     parser.add_argument("--trace_file", help=("Nextflow trace file."),
                         type=str,
                         default='trace.txt')
-    parser.add_argument("--list_files", help=("Nextflow proces file to list"),
+    parser.add_argument("--list_files", help=("Nextflow process file to list"),
                         type=str,
                         default='',
-                        choices=['', 'exitcode', 'log', 'out', 'err'])
+                        choices=['', 'exitcode', 'log', 'out', 'err',
+                                 'begin', 'run', 'sh'])
     parser.add_argument("--exitcode", help=("Select only processes with "
                                             "this exitcode. If -1, keep "
-                                            "all processes."),
+                                            "all processes. Status is "
+                                            "always obtained from the "
+                                            ".exitcode file in the "
+                                            "workdirs."),
                         default=-1,
                         type=int)
     parser.add_argument("--status", help=("Select only processes with "
