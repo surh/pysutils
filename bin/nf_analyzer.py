@@ -47,6 +47,10 @@ def process_arguments():
                         default='',
                         choices=['', 'exitcode', 'log', 'out', 'err',
                                  'begin', 'run', 'sh', 'trace'])
+    parser.add_argument("--ignore_missing", help=("Ignore dirs missing "
+                                                  "the file for list_files."),
+                        default=False,
+                        action="store_true")
     parser.add_argument("--exitcode", help=("Select only processes with "
                                             "this exitcode. If -1, keep "
                                             "all processes. Status is "
@@ -174,7 +178,7 @@ def get_trace_workdirs(Trace, status='any', invert=False):
     return workdirs
 
 
-def list_nf_files(workdirs, file):
+def list_nf_files(workdirs, file, ignore_missing=False):
     """For a list of workdirs, check the existance and list
     one type of nextflow files"""
 
@@ -187,10 +191,11 @@ def list_nf_files(workdirs, file):
             file_path = '.command.' + file
         file_path = os.path.join(wd, file_path)
         # print(file_path)
-        if not os.path.isfile(file_path):
-            raise FileNotFoundError("File {} not found.".format(file_path))
-        else:
+
+        if os.path.isfile(file_path):
             file_list.append(file_path)
+        elif ignore_missing is False:
+            raise FileNotFoundError("File {} not found.".format(file_path))
 
     return file_list
 
