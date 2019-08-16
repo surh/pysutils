@@ -180,7 +180,11 @@ def list_nf_files(workdirs, file):
 
     file_list = []
     for wd in workdirs:
-        file_path = '.command.' + file
+        # Create file pat. .exitcode file is different name
+        if file == 'exitcode':
+            file_path = '.exitcode'
+        else:
+            file_path = '.command.' + file
         file_path = os.path.join(wd, file_path)
         # print(file_path)
         if not os.path.isfile(file_path):
