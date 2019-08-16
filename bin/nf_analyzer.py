@@ -231,7 +231,9 @@ if __name__ == "__main__":
 
     # Get file list
     if args.list_files != '':
-        file_list = list_nf_files(workdirs=workdirs, file=args.list_files)
+        file_list = list_nf_files(workdirs=workdirs,
+                                  file=args.list_files,
+                                  ignore_missing=args.ignore_missing)
 
         # Print
         for f in file_list:
