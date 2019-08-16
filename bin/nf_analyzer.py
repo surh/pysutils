@@ -67,7 +67,7 @@ def process_arguments():
                         action="store_true")
 
     # Read arguments
-    print("Reading arguments")
+    # print("Reading arguments")
     args = parser.parse_args()
 
     # Processing goes here if needed
@@ -180,7 +180,8 @@ def list_nf_files(workdirs, file):
     for wd in workdirs:
         file_path = '.command.' + file
         file_path = os.path.join(wd, file_path)
-        if not os.path.isdir(file_path):
+        # print(file_path)
+        if not os.path.isfile(file_path):
             raise FileNotFoundError("File {} not found.".format(file_path))
         else:
             file_list.append(file_path)
@@ -194,28 +195,28 @@ if __name__ == "__main__":
     # Get list of work directories
     if args.use_trace:
         Trace = read_nf_trace(args.trace_file)
-        print("==Trace")
-        print(Trace)
+        # print("==Trace")
+        # print(Trace)
         workdirs = get_trace_workdirs(Trace=Trace,
                                       status=args.status,
                                       invert=args.invert)
     else:
         workdirs = list_work_dirs(args.workdir)
-    print("==Workdirs")
-    print(workdirs)
+    # print("==Workdirs")
+    # print(workdirs)
 
     # Get exitcodes
     Exitcodes = get_process_exitcodes(workdirs)
-    print("==Exitcodes")
-    print(Exitcodes)
+    # print("==Exitcodes")
+    # print(Exitcodes)
 
     # Select by exitcodes
     if args.exitcode != -1:
         workdirs = select_wd_by_exitcode(Exitcodes=Exitcodes,
                                          exitcode=args.exitcode,
                                          invert=args.invert)
-    print("===Workdirs")
-    print(workdirs)
+    # print("===Workdirs")
+    # print(workdirs)
 
     # Get file list
     if args.list_files != '':
