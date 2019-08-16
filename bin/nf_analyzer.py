@@ -46,7 +46,7 @@ def process_arguments():
                         type=str,
                         default='',
                         choices=['', 'exitcode', 'log', 'out', 'err',
-                                 'begin', 'run', 'sh'])
+                                 'begin', 'run', 'sh', 'trace'])
     parser.add_argument("--exitcode", help=("Select only processes with "
                                             "this exitcode. If -1, keep "
                                             "all processes. Status is "
@@ -135,6 +135,16 @@ def read_nf_trace(trace_file):
     return Trace
 
 
+def select_wd_by_exitcode(Exitcodes, exitcode=-1, invert=False):
+    """Get workdirs that match an exitcode"""
+
+    # Select by exit code
+    if exitcode != -1:
+        res = [k for k in Exitcodes if (Exitcodes[k] == exitcode) ^ invert]
+
+    return res
+
+
 def get_trace_workdirs(Trace, status='any', invert=False):
     """Read workdirs listed in nextflow trace"""
 
@@ -182,3 +192,10 @@ if __name__ == "__main__":
     Exitcodes = get_process_exitcodes(workdirs)
     print("==Exitcodes")
     print(Exitcodes)
+
+    # Select by exitcodes
+    if args.exitcode != -1:
+        workdirs = select_wd_by_exitcode(Exitcodes=Exitcodes,
+                                         exitcode=args.exitcode,
+                                         invert=args.invert)
+    print("===Workdirs")
