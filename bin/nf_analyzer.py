@@ -218,7 +218,7 @@ if __name__ == "__main__":
     print(workdirs)
 
     # Get file list
-    file_list = list_nf_files(workdirs=workdirs, file=args.file_list)
+    file_list = list_nf_files(workdirs=workdirs, file=args.list_files)
 
     # Print
     for f in file_list:
