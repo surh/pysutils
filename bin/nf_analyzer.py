@@ -102,12 +102,14 @@ def get_process_exitcodes(workdirs):
     Exitcodes = dict()
     for wd in workdirs:
         exitcode_file = os.path.join(wd, ".exitcode")
-        if not os.path.isfile(exitcode_file):
-            raise FileNotFoundError(".exitcode file missing at {}".format(wd))
 
-        with open(exitcode_file, 'r') as eh:
-            exitcode = int(eh.readline())
-            Exitcodes[wd] = exitcode
+        if os.path.isfile(exitcode_file):
+            with open(exitcode_file, 'r') as eh:
+                exitcode = int(eh.readline())
+        else:
+            # raise FileNotFoundError("{} file missing at {}".format(wd))
+            exitcode = -100
+        Exitcodes[wd] = exitcode
         eh.close()
 
     return Exitcodes
